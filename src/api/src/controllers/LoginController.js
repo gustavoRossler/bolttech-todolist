@@ -31,7 +31,7 @@ export class LoginController {
         return false;
       }
 
-      const seconds = 60 * 20;
+      const seconds = 60 * 60 * 2;
       const token = jwt.sign({ ...user }, JWT_SECRET, { expiresIn: seconds });
 
       delete user.password;
