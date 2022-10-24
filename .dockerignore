@@ -1,0 +1,5 @@
+src/web/node_modules
+src/api/node_modules
+*.log
+src/*/node_modules/*
+src/*/build/*

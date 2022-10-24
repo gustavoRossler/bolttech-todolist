@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+
+  bolttech_web:
+    container_name: bolttech_web
+    restart: always
+    build:
+      dockerfile: ./docker/web/Dockerfile
+      context: .
+    volumes:
+      - ./src/web:/app
+      - /app/node_modules
+      - /app/build
+      - /app/cache
+    ports:
+      - ${WEB_PORT}:3000
+    depends_on:
+      - bolttech_api
+
+  bolttech_api:
+    container_name: bolttech_api
+    restart: always
+    build:
+      dockerfile: ./docker/api/Dockerfile
+      context: .
+    volumes:
+      - ./src/api:/app
+      - /app/node_modules
+    ports:
+      - ${API_PORT}:${API_PORT}
+    environment:
+      - API_PORT=${API_PORT}
+    depends_on:
+      - bolttech_db
+
+  bolttech_db:
+    container_name: bolttech_db
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - bolttech_pgdata:/var/lib/postgresql/data
+
+  bolttech_pgadmin:
+    container_name: bolttech_pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
+      PGADMIN_EMAIL: ${PGADMIN_EMAIL}
+    ports:
+      - "16543:80"
+    depends_on:
+      - bolttech_db
+
+volumes:
+  bolttech_pgdata:
